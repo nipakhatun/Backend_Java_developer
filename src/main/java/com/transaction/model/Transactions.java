@@ -16,6 +16,9 @@ public class Transactions implements Cloneable{
     private LocalDateTime createdAt;
     private String Type;
     private String Actor;
+    //-	Transaction data (key-value map of strings)
+
+
 
     public Integer getId() {
         return id;

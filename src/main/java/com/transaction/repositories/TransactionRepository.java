@@ -3,9 +3,7 @@ package com.transaction.repositories;
 import com.transaction.model.Transactions;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-
 import java.util.List;
-
 public interface TransactionRepository extends CrudRepository<Transactions, Integer> {
     Transactions getById(Integer id);
 

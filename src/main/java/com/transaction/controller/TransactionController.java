@@ -1,39 +1,54 @@
 package com.transaction.controller;
 
-import com.transaction.model.TransactionRequest;
-import com.transaction.model.Transactions;
-import com.transaction.repositories.TransactionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.transaction.dto.CreateTransactionDTO;
+import com.transaction.dto.SearchTransactionDTO;
+import com.transaction.dto.TransactionResponseDTO;
+import com.transaction.dto.UpdateTransactionDTO;
+import com.transaction.service.TransactionalService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
-@RestController("TransactionController")
-@RequestMapping(path = "/transactions")
+@RestController
+@RequestMapping(path = "/api")
+@RequiredArgsConstructor
 public class TransactionController {
-    @Autowired
-    private TransactionRepository transactionRepository;
+    private final TransactionalService service;
 
-    @PostMapping(path = "/store")
-    public @ResponseBody String createTransaction(@RequestBody Transactions transactions) {
-        transactionRepository.save(transactions);
-        return "success";
-    }
-    @PostMapping(path = "/edit")
-    public @ResponseBody String uodateTransaction(@RequestBody TransactionRequest transactionRequest) {
-        Transactions transactions = transactionRepository.getById(transactionRequest.getId());
-        transactions.setActor(transactionRequest.getActor());
-        transactions.setType(transactionRequest.getType());
-        transactionRepository.save(transactions);
-        return "success";
+    @PostMapping(path = "/transactions")
+    public ResponseEntity<?>  createTransaction(@RequestBody CreateTransactionDTO transaction) {
+        service.createTransaction(transaction);
+        return ResponseEntity.ok("transaction is saved successfully!");
     }
 
-    @DeleteMapping(path = "/deleteTransaction")
-    public @ResponseBody String deleteTransaction(@PathVariable Integer transactionId) {
-        transactionRepository.deleteById(transactionId);
-        return "success";
+    @PutMapping(path = "/transactions")
+    public ResponseEntity<?> updateTransaction(@RequestBody UpdateTransactionDTO transactionRequest) {
+        service.updateTransaction(transactionRequest);
+        return ResponseEntity.ok("transaction is updated successfully!");
     }
-    @GetMapping(path = "/search")
-    public @ResponseBody String getTransactions(@PathVariable String value) {
-        transactionRepository.getTransactions(value);
-        return "success";
+
+    @GetMapping(path = "/transactions/{id}")
+    public ResponseEntity<?> fetchTransactionById(@PathVariable("id") Integer id) {
+        TransactionResponseDTO response = service.fetchTransactionById(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(path = "/transactions")
+    public ResponseEntity<?> fetchTransactions() {
+        List<TransactionResponseDTO> responses = service.fetchTransactions();
+        return ResponseEntity.ok(responses);
+    }
+
+    @DeleteMapping(path = "/transactions/{id}")
+    public ResponseEntity<?> deleteTransactionById(@PathVariable("id") Integer id) {
+        service.deleteTransactionById(id);
+        return ResponseEntity.ok("transaction is deleted successfully!");
+    }
+
+    @PostMapping(path = "/transactions/search")
+    public ResponseEntity<?>  searchTransaction(@RequestBody SearchTransactionDTO dto) {
+        List<TransactionResponseDTO> responses = service.searchTransaction(dto);
+        return ResponseEntity.ok(responses);
     }
 }

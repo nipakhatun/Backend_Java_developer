@@ -1,13 +1,15 @@
 package com.transaction.repositories;
 
-import com.transaction.model.Transactions;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import java.util.List;
-public interface TransactionRepository extends CrudRepository<Transactions, Integer> {
-    Transactions getById(Integer id);
+import com.transaction.model.Transaction;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
 
-    @Query("SELECT t FROM Transactions t WHERE t.Type LIKE %?1%"
-            + " OR t.Actor LIKE %?1%")
-    List<Transactions> getTransactions(String value);
+@Repository
+public interface TransactionRepository extends JpaRepository<Transaction, Integer> ,
+        JpaSpecificationExecutor<Transaction> {
+
+
+
+
 }

@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -14,4 +15,5 @@ public class TransactionResponseDTO {
     private LocalDateTime timeStamp;
     private String type;
     private String actor;
+    private List<TransactionalPropertyDTO> TransactionalProperties;
 }

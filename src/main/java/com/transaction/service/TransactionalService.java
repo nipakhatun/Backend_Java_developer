@@ -1,9 +1,6 @@
 package com.transaction.service;
 
-import com.transaction.dto.CreateTransactionDTO;
-import com.transaction.dto.SearchTransactionDTO;
-import com.transaction.dto.TransactionResponseDTO;
-import com.transaction.dto.UpdateTransactionDTO;
+import com.transaction.dto.*;
 import com.transaction.model.Transaction;
 import com.transaction.repositories.TransactionRepository;
 import com.transaction.repositories.specification.TransactionFilterSpecification;
@@ -11,7 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,9 +25,14 @@ public class TransactionalService {
             transaction.setTimeStamp(LocalDateTime.now());
             transaction.setType(dto.getType());
             transaction.setActor(dto.getActor());
+            /*Map<String, Object> propertyMap = new HashMap<>();
+            dto.getTransactionalProperties().forEach(value-> {
+                propertyMap.put(value.getKey(), value.getValue());
+            });*/
+            transaction.setTransactionalProperty(dto.getTransactionalProperties());
             repository.save(transaction);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -37,9 +42,14 @@ public class TransactionalService {
                             .orElseThrow(() -> new RuntimeException("no transaction found!"));
             transaction.setType(dto.getType());
             transaction.setActor(dto.getActor());
+            Map<String, Object> propertyMap = new HashMap<>();
+            dto.getTransactionalProperties().forEach(value-> {
+                propertyMap.put(value.getKey(), value.getValue());
+            });
+            transaction.setTransactionalProperty(propertyMap);
             repository.save(transaction);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -64,6 +74,14 @@ public class TransactionalService {
         responseDTO.setTimeStamp(e.getTimeStamp());
         responseDTO.setType(e.getType());
         responseDTO.setActor(e.getActor());
+        List<TransactionalPropertyDTO> properties = new ArrayList<>();
+        e.getTransactionalProperty().forEach((key, value)->{
+            TransactionalPropertyDTO dto = new TransactionalPropertyDTO();
+            dto.setKey(key);
+            dto.setValue(value);
+            properties.add(dto);
+        });
+        responseDTO.setTransactionalProperties(properties);
         return responseDTO;
     }
 
@@ -73,7 +91,7 @@ public class TransactionalService {
                     .orElseThrow(() -> new RuntimeException("no transaction found!"));
             repository.delete(transaction);
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
